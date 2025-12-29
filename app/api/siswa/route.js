@@ -16,7 +16,7 @@ export async function GET() {
             });
         }
 
-        // 1. Ambil data Santri Resmi dari DB_PONDOK
+        // 1. Ambil data Santri Resmi dari DB_PONDOK dengan info lebih lengkap
         const { results: santriPondok } = await dbPondok.prepare(`
             SELECT 
                 stambuk_madrasah as nis, 
@@ -24,6 +24,12 @@ export async function GET() {
                 kelas, 
                 kamar, 
                 foto_santri as foto,
+                alamat_santri as alamat,
+                nama_ayah,
+                nama_ibu,
+                no_telp_ayah,
+                tempat_lahir,
+                tanggal_lahir,
                 'PUSAT' as asal_data
             FROM santri 
             WHERE madrasah LIKE '%MIU%'
@@ -38,20 +44,26 @@ export async function GET() {
                 kelas, 
                 kamar, 
                 foto_santri as foto,
+                alamat,
+                nama_ayah,
+                nama_ibu,
+                no_telp_ayah,
+                tempat_lahir,
+                tanggal_lahir,
                 'LOKAL' as asal_data
             FROM siswa_lokal
             ORDER BY nama ASC
         `).all();
 
-        // 3. Ambil data Absensi dari DB_MIU (berlaku untuk keduanya)
+        // 3. Ambil data Absensi dari DB_MIU
         const { results: absensi } = await dbMiu.prepare(`
             SELECT nis_siswa, hadir, total_pertemuan FROM absensi_siswa
         `).all();
 
-        // 4. Gabungkan (Union) Data
+        // 4. Gabungkan Data
         const allSiswa = [...(santriPondok || []), ...(siswaLokal || [])];
 
-        // 5. Urutkan berdasarkan Nama & Tempelkan Persentase Absensi
+        // 5. Konsolidasi data akhir
         const finalData = allSiswa
             .map(s => {
                 const dataAbsen = absensi.find(a => a.nis_siswa === s.nis);
@@ -61,7 +73,12 @@ export async function GET() {
 
                 return {
                     ...s,
-                    kehadiran: persentase
+                    kehadiran: persentase,
+                    // Tambahan metadata untuk detail modal
+                    statistik: {
+                        hadir: dataAbsen?.hadir || 0,
+                        total: dataAbsen?.total_pertemuan || 0
+                    }
                 };
             })
             .sort((a, b) => a.nama.localeCompare(b.nama));
