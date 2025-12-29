@@ -1,6 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  /* config options here */
+  // Memberitahu Next.js untuk tidak membuat folder cache yang besar
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.cache = false;
+    }
+    return config;
+  },
 };
 
 export default nextConfig;
