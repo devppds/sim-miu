@@ -1,11 +1,10 @@
 export const runtime = 'edge';
 
-// Menggunakan wrapper db yang sudah kita buat sebelumnya di lib/db.js agar konsisten
 import { getSantriData } from '@/lib/db';
 
 export async function GET() {
+    // Kita bungkus semua dalam try-catch paling luar
     try {
-        // Query yang sangat spesifik berdasarkan screenshot yang Anda berikan
         const query = `
             SELECT 
                 id,
@@ -18,25 +17,33 @@ export async function GET() {
             FROM santri 
             WHERE madrasah LIKE '%MIU%'
             ORDER BY nama_siswa ASC
+            LIMIT 100
         `;
 
         const data = await getSantriData(query);
 
-        // Jika getSantriData mengembalikan null atau undefined (karena binding hilang)
-        if (!data) {
-            return Response.json({
-                error: "DATABASE_BINDING_MISSING",
-                message: "Aplikasi tidak bisa menemukan 'DB_PONDOK'. Pastikan Binding di Dashboard Cloudflare sudah di-Save dan di-Redeploy."
-            }, { status: 500 });
+        if (data === null) {
+            return new Response(JSON.stringify({
+                error: "BINDING_NOT_FOUND",
+                message: "Aplikasi tidak bisa mendeteksi database. Pastikan Binding di Dashboard Cloudflare sudah benar."
+            }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' }
+            });
         }
 
-        return Response.json(data);
+        return new Response(JSON.stringify(data), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
 
     } catch (e) {
-        console.error("Critical API Error:", e);
-        return Response.json({
-            error: "SERVER_ERROR",
+        return new Response(JSON.stringify({
+            error: "RUNTIME_CRASH",
             message: e.message
-        }, { status: 500 });
+        }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 }
