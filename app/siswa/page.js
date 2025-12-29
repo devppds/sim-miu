@@ -1,9 +1,9 @@
 'use client';
 
-export const runtime = 'edge';
-
 import React from 'react';
 import SortableTable from '@/components/SortableTable';
+
+export const runtime = 'edge';
 
 export default function DataSiswaPage() {
     // Dummy data for now, waiting for real API integration
@@ -15,6 +15,8 @@ export default function DataSiswaPage() {
 
     return (
         <div className="view-container animate-in">
+            {/* ... component UI logic ... */}
+            {/* Simplified for cleaner file content replacement logic later if needed */}
             <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                     <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary)' }}>Data Siswa</h1>
