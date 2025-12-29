@@ -15,7 +15,7 @@ export async function GET() {
             });
         }
 
-        // Menambahkan kolom 'foto' ke dalam select query
+        // Menggunakan kolom 'foto_santri' sesuai info user
         const { results } = await db.prepare(`
             SELECT 
                 id, 
@@ -24,7 +24,7 @@ export async function GET() {
                 kelas, 
                 kamar, 
                 status_mb as status,
-                foto
+                foto_santri as foto
             FROM santri 
             WHERE madrasah LIKE '%MIU%'
             ORDER BY nama_siswa ASC 
