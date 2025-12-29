@@ -16,38 +16,63 @@ export async function GET() {
             });
         }
 
-        // 1. Ambil data Identitas dari DB_PONDOK
-        const { results: santri } = await dbPondok.prepare(`
-            SELECT id, stambuk_madrasah as nis, nama_siswa as nama, kelas, kamar, foto_santri as foto
-            FROM santri WHERE madrasah LIKE '%MIU%'
-            ORDER BY nama_siswa ASC LIMIT 200
+        // 1. Ambil data Santri Resmi dari DB_PONDOK
+        const { results: santriPondok } = await dbPondok.prepare(`
+            SELECT 
+                stambuk_madrasah as nis, 
+                nama_siswa as nama, 
+                kelas, 
+                kamar, 
+                foto_santri as foto,
+                'PUSAT' as asal_data
+            FROM santri 
+            WHERE madrasah LIKE '%MIU%'
+            ORDER BY nama_siswa ASC
         `).all();
 
-        // 2. Ambil data Absensi dari DB_MIU
+        // 2. Ambil data Siswa Lokal dari DB_MIU
+        const { results: siswaLokal } = await dbMiu.prepare(`
+            SELECT 
+                nis, 
+                nama, 
+                kelas, 
+                kamar, 
+                foto_santri as foto,
+                'LOKAL' as asal_data
+            FROM siswa_lokal
+            ORDER BY nama ASC
+        `).all();
+
+        // 3. Ambil data Absensi dari DB_MIU (berlaku untuk keduanya)
         const { results: absensi } = await dbMiu.prepare(`
             SELECT nis_siswa, hadir, total_pertemuan FROM absensi_siswa
         `).all();
 
-        // 3. Gabungkan data di tingkat aplikasi (Client-side Join)
-        const mergedData = santri.map(s => {
-            const dataAbsen = absensi.find(a => a.nis_siswa === s.nis);
-            const persentase = dataAbsen
-                ? Math.round((dataAbsen.hadir / dataAbsen.total_pertemuan) * 100)
-                : 100; // Default 100% jika data absen belum ada
+        // 4. Gabungkan (Union) Data
+        const allSiswa = [...(santriPondok || []), ...(siswaLokal || [])];
 
-            return {
-                ...s,
-                kehadiran: persentase
-            };
-        });
+        // 5. Urutkan berdasarkan Nama & Tempelkan Persentase Absensi
+        const finalData = allSiswa
+            .map(s => {
+                const dataAbsen = absensi.find(a => a.nis_siswa === s.nis);
+                const persentase = dataAbsen
+                    ? Math.round((dataAbsen.hadir / dataAbsen.total_pertemuan) * 100)
+                    : 100;
 
-        return new Response(JSON.stringify(mergedData), {
+                return {
+                    ...s,
+                    kehadiran: persentase
+                };
+            })
+            .sort((a, b) => a.nama.localeCompare(b.nama));
+
+        return new Response(JSON.stringify(finalData), {
             status: 200,
             headers: { 'Content-Type': 'application/json' }
         });
 
     } catch (e) {
-        return new Response(JSON.stringify({ error: "API_JOIN_ERROR", message: e.message }), {
+        return new Response(JSON.stringify({ error: "API_CONSOLIDATION_ERROR", message: e.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });

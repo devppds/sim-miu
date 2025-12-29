@@ -176,6 +176,23 @@ export default function DataSiswaPage() {
                             )
                         },
                         {
+                            key: 'asal_data',
+                            label: 'Asal',
+                            render: (row) => (
+                                <span style={{
+                                    padding: '4px 8px',
+                                    borderRadius: '6px',
+                                    fontSize: '0.65rem',
+                                    fontWeight: 900,
+                                    background: row.asal_data === 'LOKAL' ? '#fef3c7' : '#e0e7ff',
+                                    color: row.asal_data === 'LOKAL' ? '#92400e' : '#3730a3',
+                                    border: `1px solid ${row.asal_data === 'LOKAL' ? '#f59e0b' : '#3b82f6'}`
+                                }}>
+                                    {row.asal_data}
+                                </span>
+                            )
+                        },
+                        {
                             key: 'kehadiran',
                             label: 'Kehadiran',
                             render: (row) => (
