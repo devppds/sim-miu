@@ -16,7 +16,7 @@ export async function GET() {
             });
         }
 
-        // 1. Ambil data Santri Resmi (Hanya kolom yang pasti ada)
+        // 1. Ambil data Santri Resmi dengan kolom yang sesuai schema (nama_siswa, alamat, dll)
         const { results: santriPondok } = await dbPondok.prepare(`
             SELECT 
                 stambuk_madrasah as nis, 
@@ -24,13 +24,19 @@ export async function GET() {
                 kelas, 
                 kamar, 
                 foto_santri as foto,
+                alamat,
+                nama_ayah,
+                nama_ibu,
+                no_telp_ayah,
+                tempat_lahir,
+                tanggal_lahir,
                 'PUSAT' as asal_data
             FROM santri 
             WHERE madrasah LIKE '%MIU%'
             ORDER BY nama_siswa ASC
         `).all();
 
-        // 2. Ambil data Siswa Lokal (Hanya kolom yang pasti ada)
+        // 2. Ambil data Siswa Lokal (Kolom sudah ditambahkan via migration)
         const { results: siswaLokal } = await dbMiu.prepare(`
             SELECT 
                 nis, 
@@ -38,6 +44,12 @@ export async function GET() {
                 kelas, 
                 kamar, 
                 foto_santri as foto,
+                alamat,
+                nama_ayah,
+                nama_ibu,
+                no_telp_ayah,
+                tempat_lahir,
+                tanggal_lahir,
                 'LOKAL' as asal_data
             FROM siswa_lokal
             ORDER BY nama ASC
@@ -72,7 +84,7 @@ export async function GET() {
         });
 
     } catch (e) {
-        return new Response(JSON.stringify({ error: "API_REVERTED_ERROR", message: e.message }), {
+        return new Response(JSON.stringify({ error: "API_FETCH_ERROR", message: e.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
