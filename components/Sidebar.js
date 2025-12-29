@@ -28,9 +28,9 @@ export default function Sidebar() {
                         </Link>
                     </li>
                     <li>
-                        <Link href="/santri" className={`nav-link ${isActive('/santri')}`}>
+                        <Link href="/siswa" className={`nav-link ${isActive('/siswa')}`}>
                             <i className="fas fa-user-graduate"></i>
-                            <span>Data Santri</span>
+                            <span>Data Siswa</span>
                         </Link>
                     </li>
                     <li>
