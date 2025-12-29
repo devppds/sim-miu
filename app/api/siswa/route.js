@@ -16,67 +16,30 @@ export async function GET() {
             });
         }
 
-        // 1. Ambil data Santri Resmi dengan kolom yang sesuai schema (nama_siswa, alamat, dll)
+        // Ambil data paling simpel saja dulu untuk debugging
         const { results: santriPondok } = await dbPondok.prepare(`
             SELECT 
                 stambuk_madrasah as nis, 
-                nama_siswa as nama, 
-                kelas, 
-                kamar, 
+                nama_siswa as nama,
+                kelas,
+                kamar,
                 foto_santri as foto,
-                alamat,
-                nama_ayah,
-                nama_ibu,
-                no_telp_ayah,
-                tempat_lahir,
-                tanggal_lahir,
                 'PUSAT' as asal_data
             FROM santri 
             WHERE madrasah LIKE '%MIU%'
-            ORDER BY nama_siswa ASC
         `).all();
 
-        // 2. Ambil data Siswa Lokal (Kolom sudah ditambahkan via migration)
-        const { results: siswaLokal } = await dbMiu.prepare(`
-            SELECT 
-                nis, 
-                nama, 
-                kelas, 
-                kamar, 
-                foto_santri as foto,
-                alamat,
-                nama_ayah,
-                nama_ibu,
-                no_telp_ayah,
-                tempat_lahir,
-                tanggal_lahir,
-                'LOKAL' as asal_data
-            FROM siswa_lokal
-            ORDER BY nama ASC
-        `).all();
-
-        // 3. Ambil data Absensi
         const { results: absensi } = await dbMiu.prepare(`
             SELECT nis_siswa, hadir, total_pertemuan FROM absensi_siswa
         `).all();
 
-        // 4. Gabungkan Data
-        const allSiswa = [...(santriPondok || []), ...(siswaLokal || [])];
-
-        // 5. Konsolidasi data akhir
-        const finalData = allSiswa
-            .map(s => {
-                const dataAbsen = absensi.find(a => a.nis_siswa === s.nis);
-                const persentase = (dataAbsen && dataAbsen.total_pertemuan > 0)
-                    ? Math.round((dataAbsen.hadir / dataAbsen.total_pertemuan) * 100)
-                    : 100;
-
-                return {
-                    ...s,
-                    kehadiran: persentase
-                };
-            })
-            .sort((a, b) => a.nama.localeCompare(b.nama));
+        const finalData = (santriPondok || []).map(s => {
+            const dataAbsen = absensi.find(a => a.nis_siswa === s.nis);
+            const persentase = (dataAbsen && dataAbsen.total_pertemuan > 0)
+                ? Math.round((dataAbsen.hadir / dataAbsen.total_pertemuan) * 100)
+                : 100;
+            return { ...s, kehadiran: persentase };
+        });
 
         return new Response(JSON.stringify(finalData), {
             status: 200,
@@ -84,7 +47,7 @@ export async function GET() {
         });
 
     } catch (e) {
-        return new Response(JSON.stringify({ error: "API_FETCH_ERROR", message: e.message }), {
+        return new Response(JSON.stringify({ error: "DEBUG_ERROR", message: e.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
