@@ -8,6 +8,8 @@ export default function DataSiswaPage() {
     const [data, setData] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const [searchTerm, setSearchTerm] = useState('');
+
     const fetchSiswa = async () => {
         setLoading(true);
         try {
@@ -18,6 +20,16 @@ export default function DataSiswaPage() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const filteredData = data.filter(item =>
+        item.nama?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.nis?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.kelas?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleAction = (type, row) => {
+        alert(`${type} untuk: ${row.nama}\nNIS: ${row.nis}\nFitur ini sedang dalam tahap pengembangan.`);
     };
 
     useEffect(() => {
@@ -55,7 +67,7 @@ export default function DataSiswaPage() {
                         <i className={`fas fa-sync ${loading ? 'fa-spin' : ''}`} style={{ marginRight: '8px' }}></i>
                         Refresh
                     </button>
-                    <button className="btn btn-primary">
+                    <button className="btn btn-primary" onClick={() => alert('Fitur Tambah Siswa Baru akan segera diaktifkan.')}>
                         <i className="fas fa-user-plus" style={{ marginRight: '8px' }}></i> Tambah Siswa Baru
                     </button>
                 </div>
@@ -73,12 +85,14 @@ export default function DataSiswaPage() {
                     </div>
                 </div>
                 <div className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#ecfdf5', color: '#10b981', display: 'flex', alignItems: 'center', justifyCenter: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
-                        <i className="fas fa-check-double"></i>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f0fdf4', color: '#10b981', display: 'flex', alignItems: 'center', justifyCenter: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
+                        <i className="fas fa-check-circle"></i>
                     </div>
                     <div>
-                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Status Aktif</div>
-                        <div style={{ fontSize: '1.25rem', fontWeight: 800 }}>{data.filter(s => s.status === 'MB').length} <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>MB</span></div>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Rata-rata Kehadiran</div>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800 }}>
+                            {data.length > 0 ? Math.round(data.reduce((acc, curr) => acc + (curr.kehadiran || 0), 0) / data.length) : 0}%
+                        </div>
                     </div>
                 </div>
             </div>
@@ -91,6 +105,8 @@ export default function DataSiswaPage() {
                         <input
                             type="text"
                             placeholder="Cari Nama, NIS, atau Kelas..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                             style={{
                                 width: '100%',
                                 padding: '10px 10px 10px 40px',
@@ -102,10 +118,10 @@ export default function DataSiswaPage() {
                         />
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
-                        <button className="btn" style={{ padding: '8px 12px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                        <button className="btn" style={{ padding: '8px 12px', background: '#f8fafc', border: '1px solid #e2e8f0' }} onClick={() => alert('Filter Lanjutan akan segera tersedia.')}>
                             <i className="fas fa-filter" style={{ marginRight: '6px' }}></i> Filter
                         </button>
-                        <button className="btn" style={{ padding: '8px 12px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                        <button className="btn" style={{ padding: '8px 12px', background: '#f8fafc', border: '1px solid #e2e8f0' }} onClick={() => alert('Data sedang disiapkan untuk export Excel/PDF.')}>
                             <i className="fas fa-file-export" style={{ marginRight: '6px' }}></i> Export
                         </button>
                     </div>
@@ -192,15 +208,15 @@ export default function DataSiswaPage() {
                             label: 'Aksi',
                             render: (row) => (
                                 <div style={{ display: 'flex', gap: '8px' }}>
-                                    <button className="action-btn" title="Detail"><i className="fas fa-chevron-right"></i></button>
-                                    <button className="action-btn edit" title="Ubah"><i className="fas fa-pencil-alt"></i></button>
+                                    <button className="action-btn" title="Detail" onClick={() => handleAction('Detail Profil', row)}><i className="fas fa-eye"></i></button>
+                                    <button className="action-btn edit" title="Ubah" onClick={() => handleAction('Edit Data', row)}><i className="fas fa-pencil-alt"></i></button>
                                 </div>
                             )
                         }
                     ]}
-                    data={data}
+                    data={filteredData}
                     loading={loading}
-                    emptyMessage="Tidak ada data siswa ditemukan untuk unit MIU."
+                    emptyMessage={searchTerm ? `Tidak ditemukan siswa dengan kata kunci "${searchTerm}"` : "Tidak ada data siswa ditemukan untuk unit MIU."}
                 />
             </div>
 
