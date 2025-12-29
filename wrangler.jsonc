@@ -1,0 +1,20 @@
+{
+    "name": "sim-miu-app",
+    "compatibility_date": "2024-11-18",
+    "compatibility_flags": [
+        "nodejs_compat"
+    ],
+    "pages_build_output_dir": ".vercel/output",
+    "d1_databases": [
+        {
+            "binding": "DB_MIU",
+            "database_name": "sim-miu",
+            "database_id": "c6b13ae1-c37a-4275-ab61-402bea291cd1"
+        },
+        {
+            "binding": "DB_PONDOK",
+            "database_name": "sim-ppds-db-v2",
+            "database_id": "27ec7392-6ac2-4bdc-8570-69ab4057e485"
+        }
+    ]
+}
