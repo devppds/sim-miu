@@ -9,11 +9,11 @@ export async function GET(request) {
     // --- 1. Statistik Dashboard (Santri MIU) ---
     if (type === 'stats') {
         try {
+            // Kita hapus filter 'status_santri' karena tidak terlihat di schema screenshot terbaru
             const queryTotal = `
             SELECT COUNT(*) as total 
             FROM santri 
-            WHERE status_santri = 'Aktif' 
-            AND madrasah = 'MIU'
+            WHERE madrasah LIKE '%MIU%'
         `;
 
             const santriResult = await getSantriData(queryTotal);
@@ -22,8 +22,7 @@ export async function GET(request) {
             const queryKelas = `
             SELECT kelas as kelas, COUNT(*) as count 
             FROM santri 
-            WHERE status_santri = 'Aktif'
-            AND madrasah = 'MIU'
+            WHERE madrasah LIKE '%MIU%'
             GROUP BY kelas 
             ORDER BY kelas ASC
         `;

@@ -4,6 +4,12 @@ import { getSantriData } from '@/lib/db';
 
 export async function GET() {
     try {
+        const queryTotal = `
+            SELECT COUNT(*) as total 
+            FROM santri 
+            WHERE madrasah LIKE '%MIU%'
+        `;
+
         const query = `
             SELECT 
                 id,
@@ -14,7 +20,7 @@ export async function GET() {
                 status_mb as status,
                 tahun_masuk
             FROM santri 
-            WHERE madrasah = 'MIU'
+            WHERE madrasah LIKE '%MIU%'
             ORDER BY kelas ASC, nama_siswa ASC
         `;
 
