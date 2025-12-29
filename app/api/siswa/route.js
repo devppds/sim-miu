@@ -55,7 +55,7 @@ export async function GET() {
         const finalData = allSiswa
             .map(s => {
                 const dataAbsen = absensi.find(a => a.nis_siswa === s.nis);
-                const persentase = dataAbsen
+                const persentase = (dataAbsen && dataAbsen.total_pertemuan > 0)
                     ? Math.round((dataAbsen.hadir / dataAbsen.total_pertemuan) * 100)
                     : 100;
 

@@ -162,8 +162,8 @@ header {
   align-items: center;
   gap: 12px;
   background: linear-gradient(to right, #60a5fa, #3b82f6);
-  background-clip: text;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
