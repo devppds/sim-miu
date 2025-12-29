@@ -1,22 +1,11 @@
 export const runtime = 'edge';
 
-import { getRequestContext } from '@cloudflare/next-on-pages';
+// Menggunakan wrapper db yang sudah kita buat sebelumnya di lib/db.js agar konsisten
+import { getSantriData } from '@/lib/db';
 
 export async function GET() {
     try {
-        const ctx = getRequestContext();
-
-        // Cek apakah env tersedia
-        if (!ctx || !ctx.env) {
-            return Response.json({ error: "Environment not found" }, { status: 500 });
-        }
-
-        const db = ctx.env.DB_PONDOK;
-        if (!db) {
-            return Response.json({ error: "DB_PONDOK binding missing" }, { status: 500 });
-        }
-
-        // Query riil sesuai screenshot database Anda
+        // Query yang sangat spesifik berdasarkan screenshot yang Anda berikan
         const query = `
             SELECT 
                 id,
@@ -31,13 +20,23 @@ export async function GET() {
             ORDER BY nama_siswa ASC
         `;
 
-        const result = await db.prepare(query).all();
+        const data = await getSantriData(query);
 
-        // Kita kembalikan ARRAY LANGSUNG agar kompatibel dengan Tabel di UI
-        return Response.json(result.results || []);
+        // Jika getSantriData mengembalikan null atau undefined (karena binding hilang)
+        if (!data) {
+            return Response.json({
+                error: "DATABASE_BINDING_MISSING",
+                message: "Aplikasi tidak bisa menemukan 'DB_PONDOK'. Pastikan Binding di Dashboard Cloudflare sudah di-Save dan di-Redeploy."
+            }, { status: 500 });
+        }
+
+        return Response.json(data);
 
     } catch (e) {
-        console.error("API Error:", e);
-        return Response.json({ error: e.message }, { status: 500 });
+        console.error("Critical API Error:", e);
+        return Response.json({
+            error: "SERVER_ERROR",
+            message: e.message
+        }, { status: 500 });
     }
 }
