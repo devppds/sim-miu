@@ -4,6 +4,9 @@ import { AuthProvider } from '@/lib/AuthContext';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 
+// WAJIB: Memastikan seluruh aplikasi berjalan di Edge Runtime untuk Cloudflare
+export const runtime = 'edge';
+
 export const metadata = {
   title: "Dashboard MIU",
   description: "Sistem Informasi Manajemen Madrasah Ihya' Ulumuddin",
