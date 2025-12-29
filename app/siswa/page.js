@@ -36,8 +36,9 @@ export default function DataSiswaPage() {
                         <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)' }}>TOTAL:</span>
                         <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{data.length}</span>
                     </div>
-                    <button className="btn btn-primary" onClick={fetchSiswa}>
-                        <i className="fas fa-sync" style={{ marginRight: '8px' }}></i> Refresh
+                    <button className="btn btn-primary" onClick={fetchSiswa} disabled={loading}>
+                        <i className={`fas fa-sync ${loading ? 'fa-spin' : ''}`} style={{ marginRight: '8px' }}></i>
+                        {loading ? 'Memuat...' : 'Refresh'}
                     </button>
                     <button className="btn btn-green">
                         <i className="fas fa-plus" style={{ marginRight: '8px' }}></i> Tambah
