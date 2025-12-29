@@ -13,27 +13,19 @@ export async function GET(request) {
             SELECT COUNT(*) as total 
             FROM santri 
             WHERE status_santri = 'Aktif' 
-            AND (
-                madrasah_diniyah LIKE '%ULA%' OR 
-                madrasah_diniyah LIKE '%WUSTHO%' OR 
-                madrasah_diniyah LIKE '%ULYA%'
-            )
+            AND madrasah = 'MIU'
         `;
 
             const santriResult = await getSantriData(queryTotal);
             const totalSantri = santriResult[0]?.total || 0;
 
             const queryKelas = `
-            SELECT kelas_diniyah as kelas, COUNT(*) as count 
+            SELECT kelas as kelas, COUNT(*) as count 
             FROM santri 
             WHERE status_santri = 'Aktif'
-            AND (
-                madrasah_diniyah LIKE '%ULA%' OR 
-                madrasah_diniyah LIKE '%WUSTHO%' OR 
-                madrasah_diniyah LIKE '%ULYA%'
-            )
-            GROUP BY kelas_diniyah 
-            ORDER BY kelas_diniyah ASC
+            AND madrasah = 'MIU'
+            GROUP BY kelas 
+            ORDER BY kelas ASC
         `;
             const kelasResult = await getSantriData(queryKelas);
 
