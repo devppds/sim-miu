@@ -26,43 +26,107 @@ export default function DataSiswaPage() {
 
     return (
         <div className="view-container animate-in">
-            <div style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            {/* Page Header */}
+            <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--primary)' }}>Data Siswa</h1>
-                    <p style={{ color: 'var(--text-muted)' }}>Manajemen data santri unit <strong>MIU</strong></p>
-                </div>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <div className="card" style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 0 }}>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)' }}>TOTAL:</span>
-                        <span style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>{data.length}</span>
+                    <h1 style={{
+                        fontSize: '2.25rem',
+                        fontWeight: 900,
+                        fontFamily: 'Outfit, sans-serif',
+                        color: 'var(--text-main)',
+                        letterSpacing: '-1px'
+                    }}>
+                        Data Master Siswa
+                    </h1>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+                        <span className="badge badge-success">Unit MIU</span>
+                        <span style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 500 }}>
+                            Manajemen database seluruh santri Madrasah Ihya' Ulumuddin.
+                        </span>
                     </div>
-                    <button className="btn btn-primary" onClick={fetchSiswa} disabled={loading}>
+                </div>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                    <button
+                        className="btn"
+                        onClick={fetchSiswa}
+                        disabled={loading}
+                        style={{ background: 'white', border: '1px solid var(--border-medium)', color: 'var(--text-main)' }}
+                    >
                         <i className={`fas fa-sync ${loading ? 'fa-spin' : ''}`} style={{ marginRight: '8px' }}></i>
-                        {loading ? 'Memuat...' : 'Refresh'}
+                        Refresh
                     </button>
-                    <button className="btn btn-green">
-                        <i className="fas fa-plus" style={{ marginRight: '8px' }}></i> Tambah
+                    <button className="btn btn-primary">
+                        <i className="fas fa-user-plus" style={{ marginRight: '8px' }}></i> Tambah Siswa Baru
                     </button>
                 </div>
             </div>
 
-            <div className="card" style={{ padding: '1rem' }}>
+            {/* Stats Row for Siswa */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem', marginBottom: '2rem' }}>
+                <div className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: 'var(--primary-light)', color: 'var(--primary)', display: 'flex', alignItems: 'center', justifyCenter: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
+                        <i className="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Total Siswa</div>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800 }}>{data.length}</div>
+                    </div>
+                </div>
+                <div className="card" style={{ padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#ecfdf5', color: '#10b981', display: 'flex', alignItems: 'center', justifyCenter: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
+                        <i className="fas fa-check-double"></i>
+                    </div>
+                    <div>
+                        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Status Aktif</div>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800 }}>{data.filter(s => s.status === 'MB').length} <span style={{ fontSize: '0.8rem', opacity: 0.5 }}>MB</span></div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Main Data Table */}
+            <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+                <div style={{ padding: '1.5rem 1.75rem', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff' }}>
+                    <div style={{ position: 'relative', width: '350px' }}>
+                        <i className="fas fa-search" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }}></i>
+                        <input
+                            type="text"
+                            placeholder="Cari Nama, NIS, atau Kelas..."
+                            style={{
+                                width: '100%',
+                                padding: '10px 10px 10px 40px',
+                                borderRadius: '10px',
+                                border: '1px solid var(--border-medium)',
+                                fontSize: '0.9rem',
+                                outline: 'none'
+                            }}
+                        />
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        <button className="btn" style={{ padding: '8px 12px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                            <i className="fas fa-filter" style={{ marginRight: '6px' }}></i> Filter
+                        </button>
+                        <button className="btn" style={{ padding: '8px 12px', background: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                            <i className="fas fa-file-export" style={{ marginRight: '6px' }}></i> Export
+                        </button>
+                    </div>
+                </div>
+
                 <SortableTable
                     columns={[
                         {
                             key: 'foto',
-                            label: 'Foto',
+                            label: 'Profil',
                             render: (row) => (
                                 <div style={{
-                                    width: '45px',
-                                    height: '45px',
+                                    width: '42px',
+                                    height: '42px',
                                     borderRadius: '10px',
-                                    background: 'var(--bg-highlight)',
+                                    background: 'var(--border-light)',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     overflow: 'hidden',
-                                    border: '2px solid #f1f5f9'
+                                    border: '1px solid var(--border-medium)'
                                 }}>
                                     <img
                                         src={row.foto ? row.foto : `https://ui-avatars.com/api/?name=${encodeURIComponent(row.nama)}&background=random&color=fff&bold=true`}
@@ -76,28 +140,31 @@ export default function DataSiswaPage() {
                             )
                         },
                         {
-                            key: 'nis',
-                            label: 'NIS / Stambuk',
-                            render: (row) => <span style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--primary)' }}>{row.nis}</span>
-                        },
-                        {
                             key: 'nama',
-                            label: 'Nama Lengkap',
+                            label: 'Informasi Santri',
                             render: (row) => (
                                 <div>
-                                    <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{row.nama}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>ID: {row.id}</div>
+                                    <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>{row.nama}</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>NIS: {row.nis}</div>
                                 </div>
                             )
                         },
-                        { key: 'kelas', label: 'Kelas' },
-                        { key: 'kamar', label: 'Kamar' },
+                        {
+                            key: 'kelas',
+                            label: 'Akademik',
+                            render: (row) => (
+                                <div>
+                                    <div style={{ fontWeight: 600 }}>{row.kelas}</div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Kamar {row.kamar || '-'}</div>
+                                </div>
+                            )
+                        },
                         {
                             key: 'status',
-                            label: 'Status MB',
+                            label: 'Tipe',
                             render: (row) => (
-                                <span className={`badge ${row.status === 'MB' ? 'badge-success' : 'badge-secondary'}`} style={{ borderRadius: '6px', fontSize: '0.7rem' }}>
-                                    {row.status === 'MB' ? 'MAHA SANTRI' : 'BUKAN MB'}
+                                <span className={`badge ${row.status === 'MB' ? 'badge-success' : 'badge-secondary'}`}>
+                                    {row.status === 'MB' ? 'MAHA SANTRI' : 'REGULER'}
                                 </span>
                             )
                         },
@@ -105,16 +172,9 @@ export default function DataSiswaPage() {
                             key: 'aksi',
                             label: 'Aksi',
                             render: (row) => (
-                                <div style={{ display: 'flex', gap: '6px' }}>
-                                    <button className="btn-icon" title="Detail" style={{ background: '#eff6ff', color: '#2563eb' }}>
-                                        <i className="fas fa-eye"></i>
-                                    </button>
-                                    <button className="btn-icon" title="Edit" style={{ background: '#fef3c7', color: '#d97706' }}>
-                                        <i className="fas fa-edit"></i>
-                                    </button>
-                                    <button className="btn-icon" title="Hapus" style={{ background: '#fee2e2', color: '#dc2626' }}>
-                                        <i className="fas fa-trash-alt"></i>
-                                    </button>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button className="action-btn" title="Detail"><i className="fas fa-chevron-right"></i></button>
+                                    <button className="action-btn edit" title="Ubah"><i className="fas fa-pencil-alt"></i></button>
                                 </div>
                             )
                         }
@@ -126,29 +186,27 @@ export default function DataSiswaPage() {
             </div>
 
             <style jsx>{`
-                .btn-green {
-                    background: #10b981;
-                    color: white;
-                }
-                .btn-green:hover {
-                    background: #059669;
-                }
-                .btn-icon {
+                .action-btn {
                     width: 32px;
                     height: 32px;
                     border-radius: 8px;
-                    border: none;
-                    display: flex;
-                    alignItems: center;
-                    justify-content: center;
+                    border: 1px solid var(--border-medium);
+                    background: white;
+                    color: var(--text-muted);
                     cursor: pointer;
                     transition: all 0.2s;
-                    font-size: 0.85rem;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
                 }
-                .btn-icon:hover {
-                    transform: translateY(-2px);
-                    filter: brightness(0.95);
-                    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                .action-btn:hover {
+                    background: var(--primary);
+                    color: white;
+                    border-color: var(--primary);
+                }
+                .action-btn.edit:hover {
+                    background: #f59e0b;
+                    border-color: #f59e0b;
                 }
             `}</style>
         </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import StatCard from '@/components/StatCard';
 import { useAuth } from '@/lib/AuthContext';
 import { formatCurrency, apiCall } from '@/lib/utils';
 import Link from 'next/link';
@@ -37,192 +36,198 @@ export default function DashboardPage() {
     fetchDashboardData();
   }, []);
 
+  const StatBox = ({ label, value, icon, gradient }) => (
+    <div className="card" style={{
+      background: gradient,
+      color: 'white',
+      border: 'none',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
+      <div style={{ position: 'relative', zIndex: 2 }}>
+        <div style={{ opacity: 0.8, fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>{label}</div>
+        <div style={{ fontSize: '1.75rem', fontWeight: 800, fontFamily: 'Outfit, sans-serif' }}>{value}</div>
+      </div>
+      <i className={icon} style={{
+        position: 'absolute',
+        right: '-10px',
+        bottom: '-10px',
+        fontSize: '80px',
+        opacity: 0.15,
+        transform: 'rotate(-15deg)'
+      }}></i>
+    </div>
+  );
+
   return (
-    <div className="view-container">
-      {/* Header Section */}
-      <div style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <div className="animate-in">
-          <h1 style={{ fontSize: '2.5rem', fontWeight: 900, background: 'linear-gradient(to right, var(--primary), #3b82f6)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', marginBottom: '8px' }}>
-            Dashboard Utama
+    <div className="view-container animate-in">
+      {/* Welcome Section */}
+      <div style={{ marginBottom: '3rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+        <div>
+          <h1 style={{
+            fontSize: '2.5rem',
+            fontWeight: 900,
+            fontFamily: 'Outfit, sans-serif',
+            letterSpacing: '-1px',
+            color: 'var(--text-main)',
+            marginBottom: '4px'
+          }}>
+            Assalamu'alaikum, <span style={{ color: 'var(--primary)' }}>{user?.fullname || 'Administrator'}</span>
           </h1>
-          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem' }}>
-            Ahlan wa Sahlan, <strong>{user?.fullname || 'Admin'}</strong>. Berikut adalah ringkasan unit Anda hari ini.
+          <p style={{ color: 'var(--text-muted)', fontSize: '1.1rem', fontWeight: 500 }}>
+            Pantau perkembangan dan operasional Madrasah dalam satu sentuhan.
           </p>
         </div>
-        <div style={{ background: '#fff', padding: '12px 24px', borderRadius: '16px', boxShadow: 'var(--shadow-md)', border: '1px solid #f1f5f9' }}>
-          <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase' }}>Tahun Ajaran</div>
-          <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--primary)' }}>1446-1447 H / 2025-2026 M</div>
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>Tahun Ajaran</div>
+          <div style={{
+            fontSize: '1.25rem',
+            fontWeight: 800,
+            color: 'var(--primary)',
+            background: 'var(--primary-light)',
+            padding: '4px 16px',
+            borderRadius: '10px',
+            marginTop: '4px'
+          }}>1446-1447 H</div>
         </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="stats-grid" style={{ marginBottom: '3rem' }}>
-        <StatCard
-          label="Total Santri Aktif"
+      {/* Main Stats Grid */}
+      <div className="grid grid-4" style={{ marginBottom: '3rem' }}>
+        <StatBox
+          label="Santri Aktif"
           value={loading ? '...' : stats.santriTotal}
-          icon="fas fa-users"
-          colorClass="stat-blue"
+          icon="fas fa-user-graduate"
+          gradient="linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)"
         />
-        <StatCard
-          label="Kader Pengajar"
+        <StatBox
+          label="Tenaga Pengajar"
           value={loading ? '...' : stats.ustadzTotal}
-          icon="fas fa-mosque"
-          colorClass="stat-purple"
+          icon="fas fa-chalkboard-teacher"
+          gradient="linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)"
         />
-        <StatCard
+        <StatBox
           label="Pemasukan (Bulan Ini)"
           value={loading ? '...' : formatCurrency(stats.keuanganTotal)}
-          icon="fas fa-hand-holding-heart"
-          colorClass="stat-green"
-        />
-        <StatCard
-          label="Kas Operasional"
-          value={loading ? '...' : formatCurrency(stats.kasTotal)}
           icon="fas fa-wallet"
-          colorClass="stat-yellow"
+          gradient="linear-gradient(135deg, #10b981 0%, #059669 100%)"
+        />
+        <StatBox
+          label="Saldo Kas MIU"
+          value={loading ? '...' : formatCurrency(stats.kasTotal)}
+          icon="fas fa-coins"
+          gradient="linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)"
         />
       </div>
 
-      {/* Main Grid: Transactions & Alerts */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1.4fr', gap: '2.5rem' }}>
+      {/* Content Layout */}
+      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
 
-        {/* Left Column */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-          {/* Recent Activity */}
-          <div className="card" style={{ padding: '0' }}>
-            <div className="card-header" style={{ padding: '2rem', borderBottom: '1px solid #f1f5f9', marginBottom: 0 }}>
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Aktivitas Transaksi Terbaru</h2>
-              <Link href="/bendahara/arus-kas" className="btn btn-secondary btn-sm" style={{ padding: '8px 16px' }}>Lihat Laporan</Link>
-            </div>
-            <SortableTable
-              columns={[
-                {
-                  key: 'kategori',
-                  label: 'Kategori',
-                  render: (row) => (
-                    <div style={{ paddingLeft: '1rem' }}>
+        {/* Left Column: Recent Activities */}
+        <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
+          <div style={{ padding: '1.75rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)' }}>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, fontFamily: 'Outfit, sans-serif' }}>Transaksi Keuangan Terkini</h3>
+            <Link href="/keuangan" className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.8rem' }}>
+              Semua Transaksi
+            </Link>
+          </div>
+          <SortableTable
+            columns={[
+              {
+                key: 'kategori',
+                label: 'Deskripsi',
+                render: (row) => (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '8px',
+                      background: row.tipe === 'Masuk' ? '#ecfdf5' : '#fef2f2',
+                      color: row.tipe === 'Masuk' ? '#10b981' : '#ef4444',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <i className={row.tipe === 'Masuk' ? "fas fa-arrow-down" : "fas fa-arrow-up"}></i>
+                    </div>
+                    <div>
                       <div style={{ fontWeight: 700 }}>{row.kategori}</div>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{row.keterangan || 'Selesai'}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{row.keterangan}</div>
                     </div>
-                  )
-                },
-                {
-                  key: 'nominal',
-                  label: 'Nominal',
-                  render: (row) => (
-                    <div style={{ fontWeight: 800, color: row.tipe === 'Masuk' ? 'var(--success)' : 'var(--danger)' }}>
-                      {row.tipe === 'Masuk' ? '+' : '-'} {formatCurrency(row.nominal)}
-                    </div>
-                  )
-                },
-                {
-                  key: 'tanggal',
-                  label: 'Tanggal',
-                  render: (row) => <span style={{ fontSize: '0.85rem' }}>{new Date(row.tanggal).toLocaleDateString('id-ID')}</span>
-                },
-                {
-                  key: 'status',
-                  label: 'Status',
-                  render: (row) => (
-                    <span className="th-badge" style={{ background: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: '20px', fontSize: '0.7rem', fontWeight: 700 }}>
-                      Selesai
-                    </span>
-                  )
-                }
-              ]}
-              data={lastActivities}
-              loading={loading}
-              emptyMessage="Belum ada riwayat hari ini."
-            />
-          </div>
-
-          {/* Santri Distribution Chart */}
-          <div className="card">
-            <div className="card-header" style={{ marginBottom: '1.5rem' }}>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 800 }}>Statistik Santri per Kelas</h2>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {loading ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Memuat data statistik...</div>
-              ) : (stats.santriChart || []).length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Belum ada data santri.</div>
-              ) : (
-                stats.santriChart.map((c, i) => {
-                  const percentage = (c.count / stats.santriTotal) * 100;
-                  return (
-                    <div key={i} style={{ marginBottom: '0.5rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.85rem' }}>
-                        <span style={{ fontWeight: 700 }}>{c.kelas || 'N/A'}</span>
-                        <span style={{ fontWeight: 800, color: 'var(--primary)' }}>{c.count} Santri</span>
-                      </div>
-                      <div style={{ height: '10px', background: '#f1f5f9', borderRadius: '10px', overflow: 'hidden' }}>
-                        <div style={{
-                          width: `${percentage}%`,
-                          height: '100%',
-                          background: `linear-gradient(to right, var(--primary), ${['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b'][i % 4]})`,
-                          transition: 'width 1s ease-out'
-                        }}></div>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
+                  </div>
+                )
+              },
+              {
+                key: 'nominal',
+                label: 'Jumlah',
+                render: (row) => (
+                  <div style={{ fontWeight: 800, color: row.tipe === 'Masuk' ? '#059669' : '#dc2626' }}>
+                    {row.tipe === 'Masuk' ? '+' : '-'} {formatCurrency(row.nominal)}
+                  </div>
+                )
+              },
+              {
+                key: 'tanggal',
+                label: 'Tanggal',
+                render: (row) => <span style={{ fontWeight: 600, color: 'var(--text-muted)' }}>{new Date(row.tanggal).toLocaleDateString('id-ID')}</span>
+              }
+            ]}
+            data={lastActivities}
+            loading={loading}
+          />
         </div>
 
-        {/* Right Column: Informational Widgets */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-
-          {/* Welcome Banner */}
+        {/* Right Column: Mini Stats & Info */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          {/* Quick Alert Card */}
           <div style={{
-            background: 'linear-gradient(135deg, var(--primary) 0%, #1e40af 100%)',
-            padding: '2.5rem',
-            borderRadius: '24px',
+            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
             color: 'white',
-            position: 'relative',
-            overflow: 'hidden',
-            boxShadow: '0 20px 25px -5px rgba(30, 58, 138, 0.2)'
+            borderRadius: '20px',
+            padding: '2rem',
+            boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)'
           }}>
-            <div style={{ position: 'relative', zIndex: 2 }}>
-              <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem' }}>Sistem Informasi Manajemen Terintegrasi</h3>
-              <p style={{ opacity: 0.85, fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
-                Memantau seluruh perkembangan santri dan arus kas unit secara real-time dari satu dashboard tunggal.
-              </p>
-              <Link href="/sekretariat/santri" className="btn" style={{ background: 'white', color: 'var(--primary)', padding: '12px 24px' }}>
-                Lihat Database Santri <i className="fas fa-arrow-right"></i>
-              </Link>
+            <h4 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1rem', fontFamily: 'Outfit, sans-serif' }}>Pusat Informasi</h4>
+            <p style={{ fontSize: '0.9rem', opacity: 0.8, lineHeight: '1.6', marginBottom: '1.5rem' }}>
+              Jangan lupa untuk memverifikasi data santri unit MIU di menu Akademik sebelum Tahun Ajaran baru dimulai.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem' }}>
+                <i className="fas fa-check-circle" style={{ color: '#10b981' }}></i>
+                <span>Database Sinkron</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem' }}>
+                <i className="fas fa-clock" style={{ color: '#f59e0b' }}></i>
+                <span>Update: 2 menit yang lalu</span>
+              </div>
             </div>
-            <i className="fas fa-mosque" style={{ position: 'absolute', bottom: '-20px', right: '-10px', fontSize: '120px', opacity: 0.1, transform: 'rotate(-20deg)' }}></i>
           </div>
 
-          {/* Quick Profile Info */}
+          {/* Student Capacity */}
           <div className="card">
-            <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', color: 'var(--primary-dark)' }}>Sesi Aktif</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-              <div style={{ background: '#f8fafc', padding: '1rem 1.5rem', borderRadius: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Hak Akses</div>
-                <div style={{ fontWeight: 800, color: 'var(--primary)', textTransform: 'uppercase' }}>{user?.role || 'Developer'}</div>
-              </div>
-              <div style={{ background: '#f8fafc', padding: '1rem 1.5rem', borderRadius: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Update Terakhir</div>
-                <div style={{ fontWeight: 700 }}>{new Date().toLocaleTimeString('id-ID')}</div>
-              </div>
+            <h4 style={{ fontSize: '1.1rem', fontWeight: 800, marginBottom: '1.5rem', fontFamily: 'Outfit, sans-serif' }}>Kapasitas Kelas</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              {(stats.santriChart || []).slice(0, 4).map((c, i) => (
+                <div key={i}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <span style={{ fontWeight: 600, fontSize: '0.85rem' }}>{c.kelas}</span>
+                    <span style={{ fontWeight: 800, fontSize: '0.85rem' }}>{c.count} Siswa</span>
+                  </div>
+                  <div style={{ height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{
+                      width: `${(c.count / stats.santriTotal) * 100}%`,
+                      height: '100%',
+                      background: 'var(--primary)',
+                      borderRadius: '4px'
+                    }}></div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-
         </div>
-      </div>
 
-      <style jsx>{`
-                .animate-in {
-                    animation: slideInLeft 0.6s ease-out;
-                }
-                @keyframes slideInLeft {
-                    from { opacity: 0; transform: translateX(-30px); }
-                    to { opacity: 1; transform: translateX(0); }
-                }
-            `}</style>
+      </div>
     </div>
   );
 }
