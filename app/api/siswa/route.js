@@ -16,7 +16,7 @@ export async function GET() {
             });
         }
 
-        // 1. Ambil data Santri Resmi dari DB_PONDOK dengan info lebih lengkap
+        // 1. Ambil data Santri Resmi (Hanya kolom yang pasti ada)
         const { results: santriPondok } = await dbPondok.prepare(`
             SELECT 
                 stambuk_madrasah as nis, 
@@ -24,19 +24,13 @@ export async function GET() {
                 kelas, 
                 kamar, 
                 foto_santri as foto,
-                alamat_santri as alamat,
-                nama_ayah,
-                nama_ibu,
-                no_telp_ayah,
-                tempat_lahir,
-                tanggal_lahir,
                 'PUSAT' as asal_data
             FROM santri 
             WHERE madrasah LIKE '%MIU%'
             ORDER BY nama_siswa ASC
         `).all();
 
-        // 2. Ambil data Siswa Lokal dari DB_MIU
+        // 2. Ambil data Siswa Lokal (Hanya kolom yang pasti ada)
         const { results: siswaLokal } = await dbMiu.prepare(`
             SELECT 
                 nis, 
@@ -44,18 +38,12 @@ export async function GET() {
                 kelas, 
                 kamar, 
                 foto_santri as foto,
-                alamat,
-                nama_ayah,
-                nama_ibu,
-                no_telp_ayah,
-                tempat_lahir,
-                tanggal_lahir,
                 'LOKAL' as asal_data
             FROM siswa_lokal
             ORDER BY nama ASC
         `).all();
 
-        // 3. Ambil data Absensi dari DB_MIU
+        // 3. Ambil data Absensi
         const { results: absensi } = await dbMiu.prepare(`
             SELECT nis_siswa, hadir, total_pertemuan FROM absensi_siswa
         `).all();
@@ -73,12 +61,7 @@ export async function GET() {
 
                 return {
                     ...s,
-                    kehadiran: persentase,
-                    // Tambahan metadata untuk detail modal
-                    statistik: {
-                        hadir: dataAbsen?.hadir || 0,
-                        total: dataAbsen?.total_pertemuan || 0
-                    }
+                    kehadiran: persentase
                 };
             })
             .sort((a, b) => a.nama.localeCompare(b.nama));
@@ -89,7 +72,7 @@ export async function GET() {
         });
 
     } catch (e) {
-        return new Response(JSON.stringify({ error: "API_CONSOLIDATION_ERROR", message: e.message }), {
+        return new Response(JSON.stringify({ error: "API_REVERTED_ERROR", message: e.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
