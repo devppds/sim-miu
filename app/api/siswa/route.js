@@ -1,33 +1,47 @@
 export const runtime = 'edge';
 
-import { getSantriData } from '@/lib/db';
+import { getRequestContext } from '@cloudflare/next-on-pages';
 
 export async function GET() {
     try {
-        const query = `
-            SELECT 
-                id,
-                stambuk_madrasah as nis, 
-                nama_siswa as nama, 
-                kelas, 
-                kamar,
-                status_mb as status,
-                tahun_masuk
-            FROM santri 
-            WHERE madrasah LIKE '%MIU%'
-            ORDER BY kelas ASC, nama_siswa ASC
-        `;
+        const ctx = getRequestContext();
 
-        const data = await getSantriData(query);
-
-        // Debugging: Jika data kosong, kita cek binding-nya
-        if (!data || data.length === 0) {
-            console.warn("Query berhasil tapi data 0 atau Binding DB_PONDOK tidak aktif.");
+        // Cek apakah env tersedia
+        if (!ctx || !ctx.env) {
+            return Response.json({
+                error: "Konfigurasi Cloudflare Error",
+                details: "Aplikasi tidak bisa mendeteksi environment (RequestContext is empty)"
+            }, { status: 500 });
         }
 
-        return Response.json(data);
+        const db = ctx.env.DB_PONDOK;
+        if (!db) {
+            return Response.json({
+                error: "Database Tidak Terhubung",
+                details: "Binding 'DB_PONDOK' tidak ditemukan. Pastikan sudah klik 'Save' di dashboard Cloudflare dan lakukan Redeploy."
+            }, { status: 500 });
+        }
+
+        // Query test paling sederhana tanpa filter apapun
+        const query = "SELECT * FROM santri WHERE madrasah LIKE '%MIU%' LIMIT 50";
+        const result = await db.prepare(query).all();
+
+        return Response.json({
+            success: true,
+            count: result.results.length,
+            data: result.results,
+            debug_info: {
+                has_db_pondok: !!ctx.env.DB_PONDOK,
+                has_db_miu: !!ctx.env.DB_MIU,
+                env_keys: Object.keys(ctx.env)
+            }
+        });
+
     } catch (e) {
-        console.error("API Error fetch siswa:", e);
-        return Response.json({ error: e.message, details: "Cek konfigurasi D1 Bindings di Dashboard Cloudflare" }, { status: 500 });
+        return Response.json({
+            error: "Gagal Query",
+            message: e.message,
+            stack: e.stack
+        }, { status: 500 });
     }
 }
