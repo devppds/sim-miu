@@ -64,11 +64,13 @@ export default function DataSiswaPage() {
                                     overflow: 'hidden',
                                     border: '2px solid #f1f5f9'
                                 }}>
-                                    {/* Menggunakan placeholder UI Avatar berdasarkan nama */}
                                     <img
-                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.nama)}&background=random&color=fff&bold=true`}
+                                        src={row.foto ? row.foto : `https://ui-avatars.com/api/?name=${encodeURIComponent(row.nama)}&background=random&color=fff&bold=true`}
                                         alt={row.nama}
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        onError={(e) => {
+                                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(row.nama)}&background=random&color=fff&bold=true`;
+                                        }}
                                     />
                                 </div>
                             )

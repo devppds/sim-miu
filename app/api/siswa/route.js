@@ -15,10 +15,20 @@ export async function GET() {
             });
         }
 
+        // Menambahkan kolom 'foto' ke dalam select query
         const { results } = await db.prepare(`
-            SELECT id, stambuk_madrasah as nis, nama_siswa as nama, kelas, kamar, status_mb as status
-            FROM santri WHERE madrasah LIKE '%MIU%'
-            ORDER BY nama_siswa ASC LIMIT 200
+            SELECT 
+                id, 
+                stambuk_madrasah as nis, 
+                nama_siswa as nama, 
+                kelas, 
+                kamar, 
+                status_mb as status,
+                foto
+            FROM santri 
+            WHERE madrasah LIKE '%MIU%'
+            ORDER BY nama_siswa ASC 
+            LIMIT 200
         `).all();
 
         return new Response(JSON.stringify(results || []), {
