@@ -4,6 +4,8 @@ import { AuthProvider } from '@/lib/AuthContext';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 
+export const runtime = 'edge';
+
 export const metadata = {
   title: "Dashboard MIU",
   description: "Sistem Informasi Manajemen Madrasah Ihya' Ulumuddin",
