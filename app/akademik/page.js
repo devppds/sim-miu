@@ -1,8 +1,6 @@
-'use client';
-
-export const runtime = 'edge';
 
 import React from 'react';
+
 import SortableTable from '@/components/SortableTable';
 
 export default function AkademikPage() {

@@ -1,7 +1,5 @@
 'use client';
 
-export const runtime = 'edge';
-
 import React from 'react';
 import StatCard from '@/components/StatCard';
 import SortableTable from '@/components/SortableTable';
