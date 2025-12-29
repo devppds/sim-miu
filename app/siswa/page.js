@@ -160,12 +160,31 @@ export default function DataSiswaPage() {
                             )
                         },
                         {
-                            key: 'status',
-                            label: 'Tipe',
+                            key: 'kehadiran',
+                            label: 'Kehadiran',
                             render: (row) => (
-                                <span className={`badge ${row.status === 'MB' ? 'badge-success' : 'badge-secondary'}`}>
-                                    {row.status === 'MB' ? 'MAHA SANTRI' : 'REGULER'}
-                                </span>
+                                <div style={{ minWidth: '120px' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: row.kehadiran < 80 ? 'var(--danger)' : 'var(--success)' }}>
+                                            {row.kehadiran}%
+                                        </span>
+                                    </div>
+                                    <div style={{
+                                        height: '6px',
+                                        width: '100%',
+                                        background: '#f1f5f9',
+                                        borderRadius: '10px',
+                                        overflow: 'hidden'
+                                    }}>
+                                        <div style={{
+                                            height: '100%',
+                                            width: `${row.kehadiran}%`,
+                                            background: row.kehadiran < 80 ? 'var(--danger)' : 'var(--success)',
+                                            borderRadius: '10px',
+                                            transition: 'width 1s ease-in-out'
+                                        }}></div>
+                                    </div>
+                                </div>
                             )
                         },
                         {
