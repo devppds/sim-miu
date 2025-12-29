@@ -8,40 +8,36 @@ export async function GET() {
 
         // Cek apakah env tersedia
         if (!ctx || !ctx.env) {
-            return Response.json({
-                error: "Konfigurasi Cloudflare Error",
-                details: "Aplikasi tidak bisa mendeteksi environment (RequestContext is empty)"
-            }, { status: 500 });
+            return Response.json({ error: "Environment not found" }, { status: 500 });
         }
 
         const db = ctx.env.DB_PONDOK;
         if (!db) {
-            return Response.json({
-                error: "Database Tidak Terhubung",
-                details: "Binding 'DB_PONDOK' tidak ditemukan. Pastikan sudah klik 'Save' di dashboard Cloudflare dan lakukan Redeploy."
-            }, { status: 500 });
+            return Response.json({ error: "DB_PONDOK binding missing" }, { status: 500 });
         }
 
-        // Query test paling sederhana tanpa filter apapun
-        const query = "SELECT * FROM santri WHERE madrasah LIKE '%MIU%' LIMIT 50";
+        // Query riil sesuai screenshot database Anda
+        const query = `
+            SELECT 
+                id,
+                stambuk_madrasah as nis, 
+                nama_siswa as nama, 
+                kelas, 
+                kamar,
+                status_mb as status,
+                tahun_masuk
+            FROM santri 
+            WHERE madrasah LIKE '%MIU%'
+            ORDER BY nama_siswa ASC
+        `;
+
         const result = await db.prepare(query).all();
 
-        return Response.json({
-            success: true,
-            count: result.results.length,
-            data: result.results,
-            debug_info: {
-                has_db_pondok: !!ctx.env.DB_PONDOK,
-                has_db_miu: !!ctx.env.DB_MIU,
-                env_keys: Object.keys(ctx.env)
-            }
-        });
+        // Kita kembalikan ARRAY LANGSUNG agar kompatibel dengan Tabel di UI
+        return Response.json(result.results || []);
 
     } catch (e) {
-        return Response.json({
-            error: "Gagal Query",
-            message: e.message,
-            stack: e.stack
-        }, { status: 500 });
+        console.error("API Error:", e);
+        return Response.json({ error: e.message }, { status: 500 });
     }
 }
